@@ -6,7 +6,7 @@ import collections
 import itertools
 import json
 import pathlib
-from typing import Any, Collection, Dict, Hashable, Mapping, NamedTuple, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Collection, Dict, FrozenSet, Hashable, Iterable, Mapping, NamedTuple, Set, Tuple, Type, TypeVar, Union
 
 Estado = Hashable
 Simbolo = str
@@ -163,23 +163,56 @@ class AFD(AutomataFinito):
 
 
 class AFN(AutomataFinito):
+    def _validar(self):
+        pass  # TODO: ¿Hay algo que validar?
+
     @classmethod
     def _programa_a_funcion(cls, programa: Programa) \
-            -> Dict[Estado, Dict[Simbolo, Set[Estado]]]:
-        raise NotImplementedError()
+            -> Dict[Estado, Dict[Simbolo, FrozenSet[Estado]]]:
+        resultado = {}
+        for estado, siguiente, simbolo in programa:
+            resultado.setdefault(estado, {})\
+                .setdefault(simbolo, set()).add(siguiente)
+        for estado, vecinos in resultado.items():
+            for simbolo, siguientes in vecinos.items():
+                vecinos[simbolo] = frozenset(siguientes)
+        return resultado
 
-    def _validar(self):
-        raise NotImplementedError()
+    def programa(self) -> Programa:
+        resultado = []
+        for estado, vecinos in self._transicion.items():
+            for simbolo, siguientes in vecinos.items():
+                for siguiente in siguientes:
+                    resultado.append(Transicion(estado, simbolo, siguiente))
+        return resultado
 
-    def _cerradura_epsilon(self, estado) -> Collection[Estado]:
-        raise NotImplementedError()
-        visitados = set(estado)
+    def _cerradura_epsilon(self, estados: Iterable[Estado]) \
+            -> Collection[Estado]:
+        visitados = set(estados)
         cola = collections.deque(visitados)
+        transicion = self._transicion
         while cola:
-            estado = cola.popleft()
+            estado: Estado = cola.popleft()
+            for simbolo, siguientes in transicion.get(estado, {}).items():
+                if simbolo:
+                    continue
+                cola.extend(siguiente
+                            for siguiente in siguientes
+                            if siguiente not in visitados)
+                visitados.update(siguientes)
+        return visitados
 
-    def transicion(self, estado: Estado, simbolo: str) -> Estado:
-        raise NotImplementedError()
+    def transicion(self, estado: Estado, simbolo: str) -> FrozenSet[Estado]:
+        try:
+            return self._transicion[estado][simbolo]
+        except KeyError:
+            return frozenset()
 
     def __call__(self, entrada: str) -> bool:
-        raise NotImplementedError()
+        estados = self._cerradura_epsilon([self.estado_inicial])
+        for simbolo in entrada:
+            estados = {siguiente
+                       for estado in estados
+                       for siguiente in self.transicion(estado, simbolo)}
+            estados = self._cerradura_epsilon(estados)
+        return any(self.es_de_aceptacion(estado) for estado in estados)
