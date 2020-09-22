@@ -1,0 +1,328 @@
+{
+  "programa": [
+    {
+      "estado": "CGPH-",
+      "simbolo": "C",
+      "siguiente": "GP-CH"
+    },
+    {
+      "estado": "CGPH-",
+      "simbolo": "G",
+      "siguiente": "CP-GH"
+    },
+    {
+      "estado": "CGPH-",
+      "simbolo": "P",
+      "siguiente": "CG-PH"
+    },
+    {
+      "estado": "CGPH-",
+      "simbolo": "H",
+      "siguiente": "CGP-H"
+    },
+    {
+      "estado": "GP-CH",
+      "simbolo": "C",
+      "siguiente": "GP-CH"
+    },
+    {
+      "estado": "GP-CH",
+      "simbolo": "G",
+      "siguiente": "GP-CH"
+    },
+    {
+      "estado": "GP-CH",
+      "simbolo": "P",
+      "siguiente": "GP-CH"
+    },
+    {
+      "estado": "GP-CH",
+      "simbolo": "H",
+      "siguiente": "GP-CH"
+    },
+    {
+      "estado": "CP-GH",
+      "simbolo": "C",
+      "siguiente": "CP-GH"
+    },
+    {
+      "estado": "CP-GH",
+      "simbolo": "G",
+      "siguiente": "CGPH-"
+    },
+    {
+      "estado": "CP-GH",
+      "simbolo": "P",
+      "siguiente": "CP-GH"
+    },
+    {
+      "estado": "CP-GH",
+      "simbolo": "H",
+      "siguiente": "CPH-G"
+    },
+    {
+      "estado": "CG-PH",
+      "simbolo": "C",
+      "siguiente": "CG-PH"
+    },
+    {
+      "estado": "CG-PH",
+      "simbolo": "G",
+      "siguiente": "CG-PH"
+    },
+    {
+      "estado": "CG-PH",
+      "simbolo": "P",
+      "siguiente": "CG-PH"
+    },
+    {
+      "estado": "CG-PH",
+      "simbolo": "H",
+      "siguiente": "CG-PH"
+    },
+    {
+      "estado": "CGP-H",
+      "simbolo": "C",
+      "siguiente": "CGP-H"
+    },
+    {
+      "estado": "CGP-H",
+      "simbolo": "G",
+      "siguiente": "CGP-H"
+    },
+    {
+      "estado": "CGP-H",
+      "simbolo": "P",
+      "siguiente": "CGP-H"
+    },
+    {
+      "estado": "CGP-H",
+      "simbolo": "H",
+      "siguiente": "CGP-H"
+    },
+    {
+      "estado": "CPH-G",
+      "simbolo": "C",
+      "siguiente": "P-CGH"
+    },
+    {
+      "estado": "CPH-G",
+      "simbolo": "G",
+      "siguiente": "CPH-G"
+    },
+    {
+      "estado": "CPH-G",
+      "simbolo": "P",
+      "siguiente": "C-GPH"
+    },
+    {
+      "estado": "CPH-G",
+      "simbolo": "H",
+      "siguiente": "CP-GH"
+    },
+    {
+      "estado": "P-CGH",
+      "simbolo": "C",
+      "siguiente": "CPH-G"
+    },
+    {
+      "estado": "P-CGH",
+      "simbolo": "G",
+      "siguiente": "GPH-C"
+    },
+    {
+      "estado": "P-CGH",
+      "simbolo": "P",
+      "siguiente": "P-CGH"
+    },
+    {
+      "estado": "P-CGH",
+      "simbolo": "H",
+      "siguiente": "PH-CG"
+    },
+    {
+      "estado": "C-GPH",
+      "simbolo": "C",
+      "siguiente": "C-GPH"
+    },
+    {
+      "estado": "C-GPH",
+      "simbolo": "G",
+      "siguiente": "CGH-P"
+    },
+    {
+      "estado": "C-GPH",
+      "simbolo": "P",
+      "siguiente": "CPH-G"
+    },
+    {
+      "estado": "C-GPH",
+      "simbolo": "H",
+      "siguiente": "CH-GP"
+    },
+    {
+      "estado": "GPH-C",
+      "simbolo": "C",
+      "siguiente": "GPH-C"
+    },
+    {
+      "estado": "GPH-C",
+      "simbolo": "G",
+      "siguiente": "P-CGH"
+    },
+    {
+      "estado": "GPH-C",
+      "simbolo": "P",
+      "siguiente": "G-CPH"
+    },
+    {
+      "estado": "GPH-C",
+      "simbolo": "H",
+      "siguiente": "GP-CH"
+    },
+    {
+      "estado": "PH-CG",
+      "simbolo": "C",
+      "siguiente": "PH-CG"
+    },
+    {
+      "estado": "PH-CG",
+      "simbolo": "G",
+      "siguiente": "PH-CG"
+    },
+    {
+      "estado": "PH-CG",
+      "simbolo": "P",
+      "siguiente": "PH-CG"
+    },
+    {
+      "estado": "PH-CG",
+      "simbolo": "H",
+      "siguiente": "PH-CG"
+    },
+    {
+      "estado": "CGH-P",
+      "simbolo": "C",
+      "siguiente": "G-CPH"
+    },
+    {
+      "estado": "CGH-P",
+      "simbolo": "G",
+      "siguiente": "C-GPH"
+    },
+    {
+      "estado": "CGH-P",
+      "simbolo": "P",
+      "siguiente": "CGH-P"
+    },
+    {
+      "estado": "CGH-P",
+      "simbolo": "H",
+      "siguiente": "CG-PH"
+    },
+    {
+      "estado": "CH-GP",
+      "simbolo": "C",
+      "siguiente": "CH-GP"
+    },
+    {
+      "estado": "CH-GP",
+      "simbolo": "G",
+      "siguiente": "CH-GP"
+    },
+    {
+      "estado": "CH-GP",
+      "simbolo": "P",
+      "siguiente": "CH-GP"
+    },
+    {
+      "estado": "CH-GP",
+      "simbolo": "H",
+      "siguiente": "CH-GP"
+    },
+    {
+      "estado": "G-CPH",
+      "simbolo": "C",
+      "siguiente": "CGH-P"
+    },
+    {
+      "estado": "G-CPH",
+      "simbolo": "G",
+      "siguiente": "G-CPH"
+    },
+    {
+      "estado": "G-CPH",
+      "simbolo": "P",
+      "siguiente": "GPH-C"
+    },
+    {
+      "estado": "G-CPH",
+      "simbolo": "H",
+      "siguiente": "GH-CP"
+    },
+    {
+      "estado": "GH-CP",
+      "simbolo": "C",
+      "siguiente": "GH-CP"
+    },
+    {
+      "estado": "GH-CP",
+      "simbolo": "G",
+      "siguiente": "-CGPH"
+    },
+    {
+      "estado": "GH-CP",
+      "simbolo": "P",
+      "siguiente": "GH-CP"
+    },
+    {
+      "estado": "GH-CP",
+      "simbolo": "H",
+      "siguiente": "G-CPH"
+    },
+    {
+      "estado": "-CGPH",
+      "simbolo": "C",
+      "siguiente": "CH-GP"
+    },
+    {
+      "estado": "-CGPH",
+      "simbolo": "G",
+      "siguiente": "GH-CP"
+    },
+    {
+      "estado": "-CGPH",
+      "simbolo": "P",
+      "siguiente": "PH-CG"
+    },
+    {
+      "estado": "-CGPH",
+      "simbolo": "H",
+      "siguiente": "H-CGP"
+    },
+    {
+      "estado": "H-CGP",
+      "simbolo": "C",
+      "siguiente": "H-CGP"
+    },
+    {
+      "estado": "H-CGP",
+      "simbolo": "G",
+      "siguiente": "H-CGP"
+    },
+    {
+      "estado": "H-CGP",
+      "simbolo": "P",
+      "siguiente": "H-CGP"
+    },
+    {
+      "estado": "H-CGP",
+      "simbolo": "H",
+      "siguiente": "H-CGP"
+    }
+  ],
+  "estado_inicial": "CGPH-",
+  "estados_de_aceptacion": [
+    "-CGPH"
+  ]
+}
