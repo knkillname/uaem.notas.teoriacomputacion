@@ -170,7 +170,7 @@ class AFN(AutomataFinito):
     def _programa_a_funcion(cls, programa: Programa) \
             -> Dict[Estado, Dict[Simbolo, FrozenSet[Estado]]]:
         resultado = {}
-        for estado, siguiente, simbolo in programa:
+        for estado, simbolo, siguiente in programa:
             resultado.setdefault(estado, {})\
                 .setdefault(simbolo, set()).add(siguiente)
         for estado, vecinos in resultado.items():
@@ -186,16 +186,20 @@ class AFN(AutomataFinito):
                     resultado.append(Transicion(estado, simbolo, siguiente))
         return resultado
 
-    def _cerradura_epsilon(self, estados: Iterable[Estado]) \
+    def cerradura_epsilon(self, estados: Iterable[Estado]) \
             -> Collection[Estado]:
+        """
+        Calcula el conjunto de estados a los que es posible llegar a
+        partir de el conjunto de estados proporcionado, usando sólo
+        transiciones épsilon.
+        """
         visitados = set(estados)
         cola = collections.deque(visitados)
         transicion = self._transicion
         while cola:
-            estado: Estado = cola.popleft()
+            estado = cola.popleft()
             for simbolo, siguientes in transicion.get(estado, {}).items():
-                if simbolo:
-                    continue
+                if simbolo: continue  # Si no es épsilon, continuar
                 cola.extend(siguiente
                             for siguiente in siguientes
                             if siguiente not in visitados)
@@ -209,10 +213,10 @@ class AFN(AutomataFinito):
             return frozenset()
 
     def __call__(self, entrada: str) -> bool:
-        estados = self._cerradura_epsilon([self.estado_inicial])
+        estados = self.cerradura_epsilon([self.estado_inicial])
         for simbolo in entrada:
             estados = {siguiente
                        for estado in estados
                        for siguiente in self.transicion(estado, simbolo)}
-            estados = self._cerradura_epsilon(estados)
+            estados = self.cerradura_epsilon(estados)
         return any(self.es_de_aceptacion(estado) for estado in estados)
