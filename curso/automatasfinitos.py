@@ -3,6 +3,7 @@ Clases base para autómatas finitos.
 """
 import abc
 import collections
+import functools
 import itertools
 import json
 import pathlib
@@ -52,7 +53,8 @@ class AutomataFinito(abc.ABC):
     @abc.abstractmethod
     def _programa_a_funcion(cls, programa: Programa) -> Any:
         raise NotImplementedError()
-
+    
+    @property
     @abc.abstractmethod
     def programa(self) -> Programa:
         raise NotImplementedError()
@@ -63,6 +65,27 @@ class AutomataFinito(abc.ABC):
         El estado inicial del autómata.
         """
         return self._estado_inicial
+    
+    @property
+    def estados_de_aceptacion(self) -> Collection[Estado]:
+        return frozenset(self._estados_de_aceptacion)
+        
+    
+    @functools.cached_property
+    def alfabeto(self) -> Collection[Simbolo]:
+        return frozenset(simbolo
+                         for estado, simbolo, siguiente in self.programa
+                         if simbolo)
+    
+    @functools.cached_property
+    def estados(self) -> Collection[Estado]:
+        resultado = {self.estado_inicial}
+        resultado.update(self._estados_de_aceptacion)
+        resultado.update(estado
+                         for estado, simbolo, siguiente in self.programa)
+        resultado.update(siguiente 
+                         for estado, simbolo, siguiente in self.programa)
+        return frozenset(resultado)
 
     @abc.abstractmethod
     def transicion(self, estado: Estado, simbolo: str) \
@@ -83,7 +106,7 @@ class AutomataFinito(abc.ABC):
         """
         Determina si el estado es de aceptación o no.
         """
-        return estado in self._estados_de_aceptacion
+        return estado in self.estados_de_aceptacion
 
     @abc.abstractmethod
     def __call__(self, entrada: str) -> bool:
@@ -99,7 +122,7 @@ class AutomataFinito(abc.ABC):
         """
         obj = {
             'programa': [transicion._asdict()
-                         for transicion in self.programa()],
+                         for transicion in self.programa],
             'estado_inicial': self._estado_inicial,
             'estados_de_aceptacion': list(self._estados_de_aceptacion)
         }
@@ -128,10 +151,11 @@ class AFD(AutomataFinito):
             raise ValueError('Programa mal formado: hay dos o más '
                              f'trancisiones posibles para {par!r}.')
         return {(q, s): r for (q, s, r) in programa}
-
+    
+    @functools.cached_property
     def programa(self) -> Programa:
-        return [Transicion(q, s, r)
-                for (q, s), r in self._transicion.items()]
+        return tuple(Transicion(q, s, r)
+                     for (q, s), r in self._transicion.items())
 
     def _validar(self):
         estados = {q for q, s in self._transicion}  # Calcular Q
@@ -177,20 +201,21 @@ class AFN(AutomataFinito):
             for simbolo, siguientes in vecinos.items():
                 vecinos[simbolo] = frozenset(siguientes)
         return resultado
-
+    
+    @functools.cached_property
     def programa(self) -> Programa:
         resultado = []
         for estado, vecinos in self._transicion.items():
             for simbolo, siguientes in vecinos.items():
                 for siguiente in siguientes:
                     resultado.append(Transicion(estado, simbolo, siguiente))
-        return resultado
-
+        return tuple(resultado)
+    
     def cerradura_epsilon(self, estados: Iterable[Estado]) \
             -> Collection[Estado]:
         """
         Calcula el conjunto de estados a los que es posible llegar a
-        partir de el conjunto de estados proporcionado, usando sólo
+        partir de el conjunto de estados proporcionado usando sólo
         transiciones épsilon.
         """
         visitados = set(estados)
