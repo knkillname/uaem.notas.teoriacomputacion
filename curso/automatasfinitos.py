@@ -158,17 +158,9 @@ class AFD(AutomataFinito):
                      for (q, s), r in self._transicion.items())
 
     def _validar(self):
-        estados = {q for q, s in self._transicion}  # Calcular Q
-        estados.update(self._transicion.values())  # Im(δ) ⊆ Q
-        estados.update(self._estados_de_aceptacion)  # F ⊆ Q
-        estados.add(self._estado_inicial)  # q₀ ∈ Q
-
-        alfabeto = {s for q, s in self._transicion}  # Calcular Σ
-
         dominio = self._transicion.keys()
-        for par in itertools.product(estados, alfabeto):
-            if par in dominio:
-                continue
+        for par in itertools.product(self.estados, self.alfabeto):
+            if par in dominio: continue
             raise ValueError(f'Transición indefinida para {par!r}.')
 
     def transicion(self, estado: Estado, simbolo: str) -> Estado:
