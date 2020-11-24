@@ -1,111 +1,122 @@
-import collections
 import enum
-from typing import Collection, Dict, Hashable, NamedTuple, Optional, Sequence, Tuple
+import functools
+from typing import Collection, Dict, Hashable, NamedTuple, Sequence, Tuple
+
+__all__ = ['Estado', 'Simbolo', 'Cinta', 'Movimiento', 'Transicion',
+           'Programa', 'MaquinaDeTuring', ]
 
 Estado = Hashable
-Símbolo = str
-
-
-class Dirección(int, enum.Enum):
-    IZQUIERDA = -1
-    NINGUNA = 0
-    DERECHA = 1
-
-
-class Transición(NamedTuple):
-    estado: Estado
-    leer: Símbolo
-    siguiente: Estado
-    escribir: Símbolo
-    mover: int
-
-
-Programa = Collection[Transición]
+Simbolo = str
 
 
 class Cinta:
-    def __init__(self, entrada: str = '', blanco: str = ' ',
-                 posición: int = 0) -> None:
+    def __init__(self, entrada: Sequence[Simbolo], blanco: Simbolo = ' '):
         self._blanco = blanco
-        self.reiniciar(entrada)
-        self.mover(posición)
-
-    def mover(self, dirección: int) -> None:
-        self.posición += dirección
+        self._contenido = list(entrada) if entrada else [blanco]
+        self._posicion = 0
 
     @property
-    def contenido(self) -> Sequence[Símbolo]:
-        if all(isinstance(s, str) and len(s) == 1 for s in self._contenido):
-            return ''.join(self._contenido)
-        return list(self._contenido)
+    def posicion(self):
+        return self._posicion
 
-    @property
-    def blanco(self) -> Símbolo:
-        return self._blanco
-
-    @property
-    def posición(self) -> int:
-        return self._posición
-
-    @posición.setter
-    def posición(self, valor):
+    @posicion.setter
+    def posicion(self, valor: int):
         if not isinstance(valor, int):
             raise TypeError()
         valor = max(valor, 0)
-        if valor >= (longitud := len(self.contenido)):
-            faltantes = valor - longitud + 1
-            self._contenido += [self.blanco]*faltantes
-        self._posición = valor
+        if valor >= (longitud := len(self._contenido)):
+            faltan = valor - longitud + 1
+            self._contenido += [self._blanco]*faltan
+        self._posicion = valor
 
-    def leer(self) -> Símbolo:
-        return self._contenido[self.posición]
+    def leer(self) -> Simbolo:
+        return self._contenido[self.posicion]
 
-    def escribir(self, símbolo: Símbolo) -> None:
-        self._contenido[self.posición] = símbolo
+    def escribir(self, simbolo: Simbolo):
+        self._contenido[self.posicion] = simbolo
 
-    def reiniciar(self, entrada: str = ''):
-        self._contenido = list(entrada) if entrada else [self.blanco]
-        self.posición = 0
+    def derecha(self):
+        self.posicion += 1
 
-    def __repr__(self) -> str:
-        kwargs = {}
-        if (contenido := self.contenido):
-            kwargs['contenido'] = contenido
-        if (self.blanco) != ' ':
-            kwargs['blanco'] = self.blanco
-        if self.posición != 0:
-            kwargs['posición'] = self.posición
-        args = ', '.join(f'{key}={value!r}' for key, value in kwargs.items())
-        return f'{self.__class__.__name__}({args})'
+    def izquierda(self):
+        self.posicion -= 1
 
 
-class MáquinaDeTuring:
-    def __init__(self, programa: Programa, aceptación: Estado,
-                 blanco: str = ' ') -> None:
+class Movimiento(int, enum.Enum):
+    IZQUIERDA = -1
+    NINGUNO = 0
+    DERECHA = 1
+
+
+class Transicion(NamedTuple):
+    estado: Estado
+    leer: Simbolo
+    siguiente: Estado
+    escribir: Simbolo
+    mover: int
+
+
+Programa = Collection[Transicion]
+
+
+class MaquinaDeTuring:
+    def __init__(self, programa: Programa, inicial: Estado,
+                 finales: Collection[Estado], blanco: Simbolo = ' '):
+        self._transicion = MaquinaDeTuring.programa_a_funcion(programa)
+        self._inicial = inicial
+        self._finales = frozenset(finales)
         self._blanco = blanco
-        self._función_de_transición = self._programa_a_función(programa)
-        self._aceptación = aceptación
-
-    def _programa_a_función(self, programa) \
-            -> Dict[Tuple[Estado, Símbolo], Tuple[Estado, Símbolo, int]]:
-        programa = tuple(programa)
-        resultado = {
-            (estado, leer): (siguiente, escribir, mover)
-            for (estado, leer, siguiente, escribir, mover) in programa}
-
-        if len(resultado) < len(programa):
-            cuenta = collections.Counter((estado, leer)
-                                         for estado, leer, _, _, _ in programa)
-            par = cuenta.most_common(1)[0][0]
-            raise ValueError(f'Más de una transición definida para {par}.')
-
-        return resultado
 
     @property
+    def blanco(self):
+        return self._blanco
+
+    @property
+    def inicial(self):
+        return self._inicial
+
+    @property
+    def finales(self):
+        return self._finales
+
+    @staticmethod
+    def programa_a_funcion(programa) -> \
+            Dict[Tuple[Estado, Simbolo], Tuple[Estado, Simbolo, int]]:
+
+        return {(estado, simbolo): (siguiente, escribir, mover)
+                for (estado, simbolo, siguiente, escribir, mover) in programa}
+
+    @functools.cached_property
     def programa(self):
-        resultado = []
-        for transición in self._función_de_transición.items():
-            (estado, leer), (siguiente, escribir, mover) = transición
-            resultado.append(
-                Transición(estado, leer, siguiente, escribir, mover))
+        pares = self._transicion.items()
+        return tuple(
+            (estado, leer, siguiente, escribir, mover)
+            for ((estado, leer), (siguiente, escribir, mover)) in pares)
+
+    @functools.cached_property
+    def estados(self):
+        resultado = {self.inicial}
+        for (estado, simbolo, siguiente, escribir, mover) in self.programa:
+            resultado |= {estado, siguiente}
+        resultado |= self.finales
         return resultado
+
+    @functools.cached_property
+    def alfabeto(self):
+        resultado = {self.blanco}
+        for (estado, leer, siguiente, escribir, mover) in self.programa:
+            resultado |= {leer, escribir}
+        return resultado
+
+    def __call__(self, palabra: Sequence[Simbolo]) -> bool:
+        estado = self.inicial
+        cinta = Cinta(palabra, blanco=self.blanco)
+        while estado not in self.finales:
+            leer = cinta.leer()
+            tripleta = self._transicion.get((estado, leer))
+            if tripleta is None:
+                return False
+            (estado, escribir, mover) = tripleta
+            cinta.escribir(escribir)
+            cinta.posicion += mover
+        return True
